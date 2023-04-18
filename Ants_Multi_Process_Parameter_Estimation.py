@@ -22,7 +22,7 @@ def process_loop(index, parameter_dictionary):
                                  discounted_return=parameter_dictionary['discounted_return'][index],
                                  no_show=True,
                                  start_as='Play',
-                                 max_steps=500000,
+                                 max_steps=5000,
                                  sim_name=sim_name)
         end = time.perf_counter()
         out = f"Sim:: {sim_name}, Completion_Time :: {round(end - start)}"
@@ -41,10 +41,13 @@ if __name__ == '__main__':
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(process_loop, range(len(parameter_dict['decay_rate'])),
-                               [parameter_dict] * len(parameter_dict))
+                               [parameter_dict] * len(parameter_dict['decay_rate']))
 
         for result in results:
             print(result)
+
+    # for i in range(len(parameter_dict['decay_rate'])):
+    #     print(process_loop(i, parameter_dict))
 
     para_end = time.perf_counter()
     print(f"Total Completion_Time :: {round(para_end - para_start)}")
