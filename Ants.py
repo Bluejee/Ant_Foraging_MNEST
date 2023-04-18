@@ -14,11 +14,11 @@ parser.add_argument('-ns', '--no_show', action='store_true',
 parser.add_argument('--start_as', type=str, default='Play', help='Weather the simulation starts (Play)ing or (Pause)d')
 parser.add_argument('--sim_name', type=str, default='Default_sim', help='Name of the sim to create files and logs')
 parser.add_argument('--max_steps', type=int, default=80000, help='Maximum number of steps to be taken')
-parser.add_argument('--min_exploration', type=float, default=0.01)
+parser.add_argument('--min_exploration', type=float, default=0.05)
 parser.add_argument('--exploration_rate', type=float, default=0.9)
-parser.add_argument('--exploration_decay', type=float, default=0.000005)
-parser.add_argument('--learning_rate', type=float, default=0.5)
-parser.add_argument('--discounted_return', type=float, default=0.4)
+parser.add_argument('--exploration_decay', type=float, default=0.0001)
+parser.add_argument('--learning_rate', type=float, default=0.4)
+parser.add_argument('--discounted_return', type=float, default=0.85)
 parser.add_argument('--drop_amount', type=float, default=0.05)
 parser.add_argument('--dispersion_rate', type=float, default=0.1)
 parser.add_argument('--decay_rate', type=float, default=0.03)
@@ -32,7 +32,8 @@ Note : Maybe start custom variables with an _ or some identifier to prevent acci
 (Or just keep in mind the parent class and not rename variables)
 
 Run like this::
-python Ants.py --no_show --start_as='Play' --max_steps=1000 --sim_name='Hope_this_works' --min_exploration=0.05 --exploration_rate=0.9 --exploration_decay=0.0001 --learning_rate=0.4 --discounted_return=0.85
+python Ants.py --no_show --start_as='Play' --max_steps=1000 --sim_name='Hope_this_works' --min_exploration=0.05 
+--exploration_rate=0.9 --exploration_decay=0.0001 --learning_rate=0.4 --discounted_return=0.85
 """
 random.seed(12345)
 np.random.seed(12345)
@@ -54,7 +55,8 @@ class Ant(Agent):
                  exploration_rate=0.9,
                  exploration_decay=0.0001,
                  learning_rate=0.4,
-                 discounted_return=0.85):
+                 discounted_return=0.85,
+                 drop_amount=0.05):
         super().__init__(world=world, layer_name=layer_name, child=self, position=position,
                          action_list=['move_random', 'go_home', 'go_target', 'drop_home', 'drop_target'])
         self.food_count = 0
@@ -68,6 +70,9 @@ class Ant(Agent):
         #               'how much is the cell like target'           (0,1,2,3,4,...9)
         self.max_states = (2 * 5 * 5 * 5)
         self.state_hash = ''  # it is a hash that represents the state the ant exists in.
+
+        # Environment Parameters
+        self.drop_amount = drop_amount
 
         # Learning Parameters
         self.brain.min_exploration = min_exploration
@@ -200,15 +205,16 @@ class Ant(Agent):
         self.move_to_pheromone(pheromone_type='Target')
 
     def drop_home(self):
-        self.drop_pheromone(pheromone_type='Home', quantity=args.drop_amount)
+        self.drop_pheromone(pheromone_type='Home', quantity=self.drop_amount)
 
     def drop_target(self):
-        self.drop_pheromone(pheromone_type='Target', quantity=args.drop_amount)
+        self.drop_pheromone(pheromone_type='Target', quantity=self.drop_amount)
 
 
 # Setting up the Visualiser.
 class Visualise(Realise):
-    def __init__(self):
+    def __init__(self, dispersion_rate, decay_rate, drop_amount, no_show, start_as, max_steps, sim_name,
+                 exploration_rate, min_exploration, exploration_decay, learning_rate, discounted_return):
         # To Set up the Visualisation, Initialise the class with the World, required variables, and the one_step_loop
         # Initialise the world with necessary size and layers.
         # It is not recommended that the number of layers be more than 10
@@ -225,27 +231,34 @@ class Visualise(Realise):
         # Initialise the parent class. Make sure to initialise it with the child as self.
         # Adjust set parameters
         super().__init__(world=World(layer_data=layers, r_length=30, c_length=30), child=self,
-                         visualise=not args.no_show, frame_rate_cap=600, cell_size=25, sim_background=(255, 255, 255))
-        self.state = args.start_as
-        self.max_steps = args.max_steps
-        self.sim_name = args.sim_name
+                         visualise=not no_show, frame_rate_cap=600, cell_size=25, sim_background=(255, 255, 255))
+        self.state = start_as
+        self.max_steps = max_steps
+        self.sim_name = sim_name
         # Set up the new variables and performing initial setups.
         self.world.layers['Home'] = [[15, 15], [16, 16], [15, 16], [16, 15]]
         self.world.layers['Target'] = [[10, 10], [9, 9], [10, 9], [9, 10]]
 
         self.ant_list = [Ant(world=self.world,
                              layer_name='Ants',
-                             position=Vector2(random.choice(self.world.layers['Home']))) for _ in range(30)]
-        dispersion_rate = args.dispersion_rate  # percentage of pheromone to be dispersed.
+                             position=Vector2(random.choice(self.world.layers['Home'])),
+                             drop_amount=drop_amount,
+                             min_exploration=min_exploration,
+                             exploration_rate=exploration_rate,
+                             exploration_decay=exploration_decay,
+                             learning_rate=learning_rate,
+                             discounted_return=discounted_return,
+                             ) for _ in range(30)]
+        dispersion_rate = dispersion_rate  # percentage of pheromone to be dispersed.
         # calculate it like this, maybe. if 0.1 of the pheromone is to be dispersed then,
 
         dispersion_matrix = np.array([[dispersion_rate / 8, dispersion_rate / 8, dispersion_rate / 8],
                                       [dispersion_rate / 8, 1 - dispersion_rate, dispersion_rate / 8],
                                       [dispersion_rate / 8, dispersion_rate / 8, dispersion_rate / 8]])
         self.pheromone_a = Essence(self.world, 'Pheromone_Home', dispersion_matrix=dispersion_matrix,
-                                   decay_rate=args.decay_rate)
+                                   decay_rate=decay_rate)
         self.pheromone_b = Essence(self.world, 'Pheromone_Target', dispersion_matrix=dispersion_matrix,
-                                   decay_rate=args.decay_rate)
+                                   decay_rate=decay_rate)
 
         # Graphing Variables
         self.max_states_explored = {}
@@ -333,10 +346,10 @@ class Visualise(Realise):
 
                 ant.earn_reward(reward)
                 ant.learn()
-                # ant.selected_action = random.choice(ant.action_list)
-                # print(max([len(ant.brain.q_table) for ant in self.ant_list]))
-                # self.max_states_explored[self.clock.time_step] = max([len(ant.brain.q_table) for ant in self.ant_list])
-                # self.food_collected[self.clock.time_step] = [ant.food_count for ant in self.ant_list]
+            # ant.selected_action = random.choice(ant.action_list)
+            # print(max([len(ant.brain.q_table) for ant in self.ant_list]))
+            # self.max_states_explored[self.clock.time_step] = max([len(ant.brain.q_table) for ant in self.ant_list])
+            # self.food_collected[self.clock.time_step] = [ant.food_count for ant in self.ant_list]
         self.pheromone_a.decay('Percentage')
         self.pheromone_b.decay('Percentage')
         self.pheromone_a.disperse()
@@ -408,6 +421,17 @@ class Visualise(Realise):
 
 
 # Instantiating the realisation/ Gods Perspective
-realise = Visualise()
+realise = Visualise(dispersion_rate=args.dispersion_rate,
+                    decay_rate=args.decay_rate,
+                    drop_amount=args.drop_amount,
+                    min_exploration=args.min_exploration,
+                    exploration_rate=args.exploration_rate,
+                    exploration_decay=args.exploration_decay,
+                    learning_rate=args.learning_rate,
+                    discounted_return=args.discounted_return,
+                    no_show=args.no_show,
+                    start_as=args.start_as,
+                    max_steps=args.max_steps,
+                    sim_name=args.sim_name)
 end_time = time.time()
 print(f'Time for execution :: {end_time - start_time}s')
