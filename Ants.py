@@ -365,8 +365,9 @@ class Visualise(Realise):
         #         if self.world.layers['Pheromone_' + layer_type][position[1], position[0]] > 1:
         #             self.world.layers['Pheromone_' + layer_type][position[1], position[0]] -= 0.01
 
-        if self.clock.time_step % 5000 == 0:
-            progress_bar(self.clock.time_step, self.max_steps)
+        if show_print:
+            if self.clock.time_step % 5000 == 0:
+                progress_bar(self.clock.time_step, self.max_steps)
 
         if self.clock.time_step >= self.max_steps:
             # do not use <a>. to analyse if using kwargs.
