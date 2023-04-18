@@ -372,6 +372,7 @@ class Visualise(Realise):
             print('Verify reproducibility by confirming this exact number.')
             print(f'Hash for this run :: {np.random.random()}')
             self.quit_sim = True
+            return
 
     def analyse(self, **kwargs):
         trial = np.array(list(self.ant_list[0].brain.q_table.values()))
@@ -420,18 +421,22 @@ class Visualise(Realise):
         print('Analysis/' + self.sim_name + '_actionper1000' + '.png')
 
 
-# Instantiating the realisation/ Gods Perspective
-realise = Visualise(dispersion_rate=args.dispersion_rate,
-                    decay_rate=args.decay_rate,
-                    drop_amount=args.drop_amount,
-                    min_exploration=args.min_exploration,
-                    exploration_rate=args.exploration_rate,
-                    exploration_decay=args.exploration_decay,
-                    learning_rate=args.learning_rate,
-                    discounted_return=args.discounted_return,
-                    no_show=args.no_show,
-                    start_as=args.start_as,
-                    max_steps=args.max_steps,
-                    sim_name=args.sim_name)
-end_time = time.time()
-print(f'Time for execution :: {end_time - start_time}s')
+# To run the following only if this is the main program.
+# To avoid running this when parallel code call this as an import.
+
+if __name__ == "__main__":
+    # Instantiating the realisation/ Gods Perspective
+    realise = Visualise(dispersion_rate=args.dispersion_rate,
+                        decay_rate=args.decay_rate,
+                        drop_amount=args.drop_amount,
+                        min_exploration=args.min_exploration,
+                        exploration_rate=args.exploration_rate,
+                        exploration_decay=args.exploration_decay,
+                        learning_rate=args.learning_rate,
+                        discounted_return=args.discounted_return,
+                        no_show=args.no_show,
+                        start_as=args.start_as,
+                        max_steps=args.max_steps,
+                        sim_name=args.sim_name)
+    end_time = time.time()
+    print(f'Time for execution :: {end_time - start_time}s')
