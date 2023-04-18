@@ -38,6 +38,8 @@ python Ants.py --no_show --start_as='Play' --max_steps=1000 --sim_name='Hope_thi
 random.seed(12345)
 np.random.seed(12345)
 
+show_print = False
+
 
 def progress_bar(progress, total):
     percent = 100 * (progress / total)
@@ -369,14 +371,15 @@ class Visualise(Realise):
         if self.clock.time_step >= self.max_steps:
             # do not use <a>. to analyse if using kwargs.
             self.analyse()
-            print('Verify reproducibility by confirming this exact number.')
-            print(f'Hash for this run :: {np.random.random()}')
+            if show_print:
+                print('Verify reproducibility by confirming this exact number.')
+                print(f'Hash for this run :: {np.random.random()}')
             self.quit_sim = True
             return
 
     def analyse(self, **kwargs):
         trial = np.array(list(self.ant_list[0].brain.q_table.values()))
-        np.savetxt('trial.csv', trial, delimiter=',')
+        # np.savetxt('trial.csv', trial, delimiter=',')
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
 
@@ -418,7 +421,8 @@ class Visualise(Realise):
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
         fig_2.savefig('Analysis/' + self.sim_name + '_actionper1000' + '.png')
-        print('Analysis/' + self.sim_name + '_actionper1000' + '.png')
+        if show_print:
+            print('Analysis/' + self.sim_name + '_actionper1000' + '.png')
 
 
 # To run the following only if this is the main program.
@@ -439,4 +443,5 @@ if __name__ == "__main__":
                         max_steps=args.max_steps,
                         sim_name=args.sim_name)
     end_time = time.time()
-    print(f'Time for execution :: {end_time - start_time}s')
+    if show_print:
+        print(f'Time for execution :: {end_time - start_time}s')
