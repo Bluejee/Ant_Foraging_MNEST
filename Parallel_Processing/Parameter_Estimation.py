@@ -20,7 +20,6 @@ def parallel_dict_maker():
                       'learning_rate': [],
                       'discounted_return': []}
 
-    # for dcy in np.arange(0.0, 0.002, 0.0001):
     for disp in np.arange(0.0, 0.11, 0.01):
         for dcy in np.arange(0.0, 0.011, 0.001):
             for drop_amount in [0.05]:
