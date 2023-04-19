@@ -21,8 +21,8 @@ def parallel_dict_maker():
                       'discounted_return': []}
 
     # for dcy in np.arange(0.0, 0.002, 0.0001):
-    for disp in [0.07, 0.08, 0.09]:
-        for dcy in [0.0017, 0.0018, 0.0015]:
+    for disp in np.arange(0.0, 0.11, 0.01):
+        for dcy in np.arange(0.0, 0.011, 0.001):
             for drop_amount in [0.05]:
                 for min_exp in [0.05]:
                     for exp_rate in [0.9]:
@@ -38,7 +38,7 @@ def parallel_dict_maker():
                                     parameter_dict['learning_rate'].append(lern_rate)
                                     parameter_dict['discounted_return'].append(disc_ret)
 
-    print(parameter_dict)
+    print(len(parameter_dict['decay_rate']))
     with open('parameter_dict.pickle', 'wb') as f:
         # Use pickle.dump() to write the dictionary to the file
         pickle.dump(parameter_dict, f)

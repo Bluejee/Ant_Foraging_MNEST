@@ -404,7 +404,7 @@ class Visualise(Realise):
         food_per1000_values = np.array(list(food_per1000.values()))
         food_per1000_values = np.sum(food_per1000_values, axis=1)
         plt.plot(food_per1000.keys(), food_per1000_values, '-.')
-        fig_1.savefig('Analysis/' + self.sim_name + '_foodper1000' + '.png')
+        fig_1.savefig('Analysis/' + 'foodper1000_' + self.sim_name + '.png')
 
         fig_2 = plt.figure(2)
         actions_per1000_values = np.array(list(actions_per1000.values()))
@@ -421,9 +421,9 @@ class Visualise(Realise):
         plt.title('Action_Distribution')
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
-        fig_2.savefig('Analysis/' + self.sim_name + '_actionper1000' + '.png')
+        fig_2.savefig('Analysis/' + 'actionper1000_' + self.sim_name + '.png')
         if show_print:
-            print('Analysis/' + self.sim_name + '_actionper1000' + '.png')
+            print(self.sim_name + ' Completed!')
 
 
 # To run the following only if this is the main program.

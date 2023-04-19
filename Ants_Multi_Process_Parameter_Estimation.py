@@ -9,8 +9,8 @@ def process_loop(index, parameter_dictionary):
     try:
         start = time.perf_counter()
         sim_name = (f"Trial_{index}_" +
-                    f"Disp_{parameter_dictionary['dispersion_rate'][index]}_" +
-                    f"Dcy_{parameter_dictionary['decay_rate'][index]}"
+                    f"Disp_{round(parameter_dictionary['dispersion_rate'][index], 5)}_" +
+                    f"Dcy_{round(parameter_dictionary['decay_rate'][index], 5)}"
                     )
         para_realise = Visualise(dispersion_rate=parameter_dictionary['dispersion_rate'][index],
                                  decay_rate=parameter_dictionary['decay_rate'][index],
@@ -22,7 +22,7 @@ def process_loop(index, parameter_dictionary):
                                  discounted_return=parameter_dictionary['discounted_return'][index],
                                  no_show=True,
                                  start_as='Play',
-                                 max_steps=5000,
+                                 max_steps=500000,
                                  sim_name=sim_name)
         end = time.perf_counter()
         out = f"Sim:: {sim_name}, Completion_Time :: {round(end - start)}"
