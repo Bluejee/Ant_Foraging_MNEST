@@ -1,8 +1,8 @@
 import concurrent.futures
 import multiprocessing
-import time
 from Ants import *
 import pickle
+import os
 
 
 def process_loop(index, parameter_dictionary):
@@ -39,6 +39,7 @@ if __name__ == '__main__':
         parameter_dict = pickle.load(f)
     para_start = time.perf_counter()
 
+    # (max_workers=int(os.cpu_count())) use this to reduce lode if needed.
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(process_loop, range(len(parameter_dict['decay_rate'])),
                                [parameter_dict] * len(parameter_dict['decay_rate']))
