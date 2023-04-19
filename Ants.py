@@ -380,7 +380,6 @@ class Visualise(Realise):
 
     def analyse(self, **kwargs):
         trial = np.array(list(self.ant_list[0].brain.q_table.values()))
-        # np.savetxt('trial.csv', trial, delimiter=',')
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
 
@@ -405,6 +404,7 @@ class Visualise(Realise):
         food_per1000_values = np.sum(food_per1000_values, axis=1)
         plt.plot(food_per1000.keys(), food_per1000_values, '-.')
         fig_1.savefig('Analysis/' + 'foodper1000_' + self.sim_name + '.png')
+        plt.close(fig_1)
 
         fig_2 = plt.figure(2)
         actions_per1000_values = np.array(list(actions_per1000.values()))
@@ -424,6 +424,7 @@ class Visualise(Realise):
         fig_2.savefig('Analysis/' + 'actionper1000_' + self.sim_name + '.png')
         if show_print:
             print(self.sim_name + ' Completed!')
+        plt.close(fig_2)
 
 
 # To run the following only if this is the main program.
