@@ -263,7 +263,7 @@ class Visualise(Realise):
                                    decay_rate=decay_rate)
 
         # Graphing Variables
-        self.max_states_explored = {}
+        self.total_food_collected = 0
         self.food_collected = {}
         self.action_distribution = {}
         # {Time_step: ['move_random', 'go_home', 'go_target', 'drop_home', 'drop_target']}
@@ -379,10 +379,9 @@ class Visualise(Realise):
             return
 
     def analyse(self, **kwargs):
-        trial = np.array(list(self.ant_list[0].brain.q_table.values()))
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
-
+        self.total_food_collected = np.sum(food)
         food_per1000 = {}
         sum_1000 = np.zeros_like(food[0])
         for i, row in enumerate(food):
@@ -403,6 +402,10 @@ class Visualise(Realise):
         food_per1000_values = np.array(list(food_per1000.values()))
         food_per1000_values = np.sum(food_per1000_values, axis=1)
         plt.plot(food_per1000.keys(), food_per1000_values, '-.')
+        plt.title('Food Collected per 1000 Steps')
+        plt.xlabel('Time Step')
+        plt.ylabel('Counts')
+        plt.ylim(0, 120)
         fig_1.savefig('Analysis/' + 'foodper1000_' + self.sim_name + '.png')
         plt.close(fig_1)
 
