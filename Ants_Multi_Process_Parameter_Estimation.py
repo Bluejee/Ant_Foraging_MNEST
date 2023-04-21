@@ -24,8 +24,9 @@ def process_loop(index, parameter_dictionary):
                                  start_as='Play',
                                  max_steps=500000,
                                  sim_name=sim_name)
+        total_food = para_realise.total_food_collected
         end = time.perf_counter()
-        out = f"Sim:: {sim_name}, Completion_Time :: {round(end - start)}"
+        out = f"Sim:: {sim_name}, Completion_Time :: {round(end - start)}, Total_Food :: {total_food}"
         return out
     except Exception as e:
         return f"Error in simulation {index}: {e}"
