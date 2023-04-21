@@ -21,7 +21,7 @@ def parallel_dict_maker(list_type='Grid'):
                       'learning_rate': [],
                       'discounted_return': []}
     if list_type == 'Random':
-        num_tests = 10
+        num_tests = 500
         for index in range(num_tests):
             parameter_dict['dispersion_rate'].append(np.random.random())
             parameter_dict['decay_rate'].append(np.random.random())
@@ -31,7 +31,6 @@ def parallel_dict_maker(list_type='Grid'):
             parameter_dict['exploration_decay'].append(np.random.random())
             parameter_dict['learning_rate'].append(np.random.random())
             parameter_dict['discounted_return'].append(np.random.random())
-        pass
     elif list_type == 'Grid':
         for disp in np.arange(0.0, 0.11, 0.01):
             for dcy in np.arange(0.0, 0.011, 0.001):
