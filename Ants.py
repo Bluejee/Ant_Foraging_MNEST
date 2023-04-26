@@ -39,6 +39,7 @@ random.seed(12345)
 np.random.seed(12345)
 
 show_print = False
+learning = False
 
 
 def progress_bar(progress, total):
@@ -347,7 +348,8 @@ class Visualise(Realise):
                     reward = 0
 
                 ant.earn_reward(reward)
-                ant.learn()
+                if learning:
+                    ant.learn()
             # ant.selected_action = random.choice(ant.action_list)
             # print(max([len(ant.brain.q_table) for ant in self.ant_list]))
             # self.max_states_explored[self.clock.time_step] = max([len(ant.brain.q_table) for ant in self.ant_list])
@@ -382,49 +384,51 @@ class Visualise(Realise):
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
         self.total_food_collected = np.sum(food)
-        food_per1000 = {}
-        sum_1000 = np.zeros_like(food[0])
+        batch_size = 1000
+        food_per_batch = {}
+        sum_batch = np.zeros_like(food[0])
         for i, row in enumerate(food):
-            sum_1000 += row
-            if i % 1000 == 0:
-                food_per1000[i] = sum_1000
-                sum_1000 = np.zeros_like(row)
+            sum_batch += row
+            if i % batch_size == 0:
+                food_per_batch[i] = sum_batch
+                sum_batch = np.zeros_like(row)
 
-        actions_per1000 = {}
-        sum_1000 = np.zeros_like(actions[0], dtype=int)
+        actions_per_batch = {}
+        sum_batch = np.zeros_like(actions[0], dtype=int)
         for i, row in enumerate(actions):
-            sum_1000 += row
-            if i % 1000 == 0:
-                actions_per1000[i] = sum_1000
-                sum_1000 = np.zeros_like(row, dtype=int)
+            sum_batch += row
+            if i % batch_size == 0:
+                actions_per_batch[i] = sum_batch
+                sum_batch = np.zeros_like(row, dtype=int)
 
         fig_1 = plt.figure(1)
-        food_per1000_values = np.array(list(food_per1000.values()))
-        food_per1000_values = np.sum(food_per1000_values, axis=1)
-        plt.plot(food_per1000.keys(), food_per1000_values, '-.')
-        plt.title('Food Collected per 1000 Steps')
+        food_per_batch_values = np.array(list(food_per_batch.values()))
+        food_per_batch_values = np.sum(food_per_batch_values, axis=1)
+        plt.plot(food_per_batch.keys(), food_per_batch_values, '-.')
+        plt.title(f'Food Collected per {batch_size} Steps')
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
+        plt.legend([f'Food/{batch_size} steps'])
         plt.ylim(0, 120)
-        fig_1.savefig('Analysis/' + 'foodper1000_' + self.sim_name + '.png')
+        fig_1.savefig('Analysis/' + f'foodper{batch_size}_' + self.sim_name + '.png')
         plt.close(fig_1)
 
         fig_2 = plt.figure(2)
-        actions_per1000_values = np.array(list(actions_per1000.values()))
+        actions_per_batch_values = np.array(list(actions_per_batch.values()))
 
         # Define the names of the actions
         action_names = self.ant_list[0].action_list
 
         # Compute the cumulative sums of the action counts for each time step
-        cumulative_counts = np.cumsum(actions_per1000_values, axis=1)
+        cumulative_counts = np.cumsum(actions_per_batch_values, axis=1)
         # Create a stacked bar plot
         for i in range(len(action_names) - 1, -1, -1):
             plt.plot(range(cumulative_counts.shape[0]), cumulative_counts[:, i], '-.')
         plt.legend(action_names)
-        plt.title('Action_Distribution')
-        plt.xlabel('Time Step')
+        plt.title(f'Action Distribution per {batch_size} Steps')
+        plt.xlabel(f'Time Step (x{batch_size})')
         plt.ylabel('Counts')
-        fig_2.savefig('Analysis/' + 'actionper1000_' + self.sim_name + '.png')
+        fig_2.savefig('Analysis/' + f'actionper{batch_size}_' + self.sim_name + '.png')
         if show_print:
             print(self.sim_name + ' Completed!')
         plt.close(fig_2)
