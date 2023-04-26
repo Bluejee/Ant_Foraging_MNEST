@@ -70,3 +70,8 @@ def parallel_dict_maker(list_type='Grid'):
 
 
 parallel_dict_maker('Random')
+
+# This is a parameter that works.
+# python .\Ants.py --dispersion_rate=0.36061122 --decay_rate=0.2305835 --drop_amount=0.53455935
+# --min_exploration=0.79382278 --exploration_rate=0.91876425 --exploration_decay=0.962777704
+# --learning_rate=0.7284984445 --discounted_return=0.16317983 --sim_name=Hope_1
