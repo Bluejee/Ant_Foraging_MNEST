@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import argparse
+import os
 
 start_time = time.time()
 parser = argparse.ArgumentParser(description='Run The ants simulation.')
@@ -381,10 +382,15 @@ class Visualise(Realise):
             return
 
     def analyse(self, **kwargs):
+        path = "Analysis"
+        # Check whether the specified path exists or not
+        if not os.path.exists(path):
+            # Create a new directory because it does not exist
+            os.makedirs(path)
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
         self.total_food_collected = np.sum(food)
-        batch_size = 1000
+        batch_size = 100
         food_per_batch = {}
         sum_batch = np.zeros_like(food[0])
         for i, row in enumerate(food):
