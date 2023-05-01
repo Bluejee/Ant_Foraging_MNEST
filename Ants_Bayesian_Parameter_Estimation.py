@@ -27,7 +27,7 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
                                  discounted_return=discounted_return,
                                  no_show=True,
                                  start_as='Play',
-                                 max_steps=2000,
+                                 max_steps=700000,
                                  sim_name=sim_name)
         total_food = para_realise.total_food_collected
         result_dict[sim_name] = [dispersion_rate, decay_rate, drop_amount, min_exploration, exploration_rate,
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     result_dict = manager.dict()
     counter = manager.Value('i', 0)
 
-    res_gp = gp_minimize(objective, space, n_calls=10, random_state=0, n_jobs=-1)
+    res_gp = gp_minimize(objective, space, n_calls=100, random_state=0, n_jobs=-1)
 
     # Print the best parameters and corresponding score
     print("Best score: %f" % res_gp.fun)
