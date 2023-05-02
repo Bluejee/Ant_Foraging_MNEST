@@ -40,7 +40,7 @@ random.seed(12345)
 np.random.seed(12345)
 
 show_print = False
-learning = False
+learning = True
 
 
 def progress_bar(progress, total):
@@ -390,7 +390,7 @@ class Visualise(Realise):
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
         self.total_food_collected = np.sum(food)
-        batch_size = 100
+        batch_size = 1000
         food_per_batch = {}
         sum_batch = np.zeros_like(food[0])
         for i, row in enumerate(food):
@@ -415,7 +415,7 @@ class Visualise(Realise):
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
         plt.legend([f'Food/{batch_size} steps'])
-        plt.ylim(0, 120)
+        plt.ylim(0, 150)
         fig_1.savefig('Analysis/' + f'foodper{batch_size}_' + self.sim_name + '.png')
         plt.close(fig_1)
 
