@@ -58,14 +58,17 @@ def objective(**params):
 if __name__ == '__main__':
     multiprocessing.freeze_support()
     para_start = time.perf_counter()
+
+    # I know this is a good value to start at.
+    x0 = [0.36061122, 0.2305835, 0.53455935, 0.79382278, 0.91876425, 0.962777704, 0.7284984445, 0.16317983]
     # Use Bayesian optimization to find the optimum parameters
 
     # Create shared dictionary and counter using Manager
     manager = multiprocessing.Manager()
     result_dict = manager.dict()
     counter = manager.Value('i', 0)
-
-    res_gp = gp_minimize(objective, space, n_calls=100, random_state=0, n_jobs=-1)
+    # process_loop(0.36061122, 0.2305835, 0.53455935, 0.79382278, 0.91876425, 0.962777704, 0.7284984445, 0.16317983)
+    res_gp = gp_minimize(objective, space, n_calls=20, random_state=0, n_jobs=-1, x0=x0, verbose=True)
 
     # Print the best parameters and corresponding score
     print("Best score: %f" % res_gp.fun)
