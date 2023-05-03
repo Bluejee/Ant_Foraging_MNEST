@@ -252,7 +252,7 @@ class Visualise(Realise):
                              exploration_decay=exploration_decay,
                              learning_rate=learning_rate,
                              discounted_return=discounted_return,
-                             ) for _ in range(30)]
+                             ) for _ in range(10)]
         dispersion_rate = dispersion_rate  # percentage of pheromone to be dispersed.
         # calculate it like this, maybe. if 0.1 of the pheromone is to be dispersed then,
 
@@ -415,7 +415,7 @@ class Visualise(Realise):
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
         plt.legend([f'Food/{batch_size} steps'])
-        plt.ylim(0, 150)
+        # plt.ylim(0, 150)
         fig_1.savefig('Analysis/' + f'foodper{batch_size}_' + self.sim_name + '.png')
         plt.close(fig_1)
 
