@@ -104,6 +104,7 @@ if __name__ == '__main__':
     max_iterations = 20
 
     print(f'Optimization Starting at :: {now_plus_time(0)}')
+    print(f'Optimization using {n_jobs} Cores')
     print('-'*100)
     for i in range(max_iterations):
         loop_start = time.perf_counter()
