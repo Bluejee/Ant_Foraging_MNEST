@@ -18,7 +18,7 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
     global batch_name
 
     try:
-        sim_name = batch_name+'/'+str(counter.value)
+        sim_name = batch_name + '/' + str(counter.value)
         counter.value += 1
         para_realise = Visualise(dispersion_rate=dispersion_rate,
                                  decay_rate=decay_rate,
@@ -77,36 +77,73 @@ def now_plus_time(seconds):
     return finish_time_string
 
 
-optimizer = Optimizer(
-    dimensions=[Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0),
-                Real(0.0, 1.0)],
-    random_state=1,
-    base_estimator='gp'
-)
-
 if __name__ == '__main__':
     multiprocessing.freeze_support()
-    para_start = time.perf_counter()
-    # Use Bayesian optimization to find the optimum parameters
+
+    ####################################################################################################################
+
+    # Setup Initial Variables
+    batch_name = 'Batch_1'
+
+    # P.S. not changing the seed will keep giving the same result. So for the same world, change the seed.
+    seed = 1  # A Random seed for reproducibility of optimizer.
+
+    # Bayesian analysis works well if more cores are used.
+    # It scans more point each iteration and hence comes to a better solution faster.
+    n_jobs = os.cpu_count()  # Max CPUs
+
+    # If cores are low then increase the number of iterations.
+    max_iterations = 20  # No. of Optimization iterations (works well for at least 40 cores not so much for 8)
+
+    ####################################################################################################################
+
+    # Create a log file for Variables.
+    # Check whether the specified path exists or not
+    if not os.path.exists(f"Analysis/{batch_name}"):
+        # Create a new directory because it does not exist
+        os.makedirs(f"Analysis/{batch_name}")
+
+    # Needs Improvement of display. Use format specifiers to make sure it looks good.
+    with open(f'Analysis/{batch_name}/0_README.', 'w') as f:
+        f.write(f"         Ant Foraging Simulation         ")
+        f.write(f"-----------------------------------------")
+        f.write(f"Batch Name           :: {batch_name}")
+        f.write(f"Random Seed          :: {seed}")
+        f.write(f"Number of Cores      :: {n_jobs}")
+        f.write(f"Number of Iterations :: {max_iterations}")
+
+    ####################################################################################################################
+
+    optimizer = Optimizer(
+        dimensions=[Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0),
+                    Real(0.0, 1.0)],
+        random_state=seed,
+        base_estimator='gp'
+    )
+
+    ####################################################################################################################
 
     # Create shared dictionary and counter using Manager
     manager = multiprocessing.Manager()
     result_dict = manager.dict()
     counter = manager.Value('i', 0)
 
-    n_jobs = os.cpu_count()
-    max_iterations = 20
-    batch_name = 'Batch_1'
+    ####################################################################################################################
 
+    para_start = time.perf_counter()
     print(f'Optimization Starting at :: {now_plus_time(0)}')
     print(f'Optimization using {n_jobs} Cores')
-    print('-'*100)
+    print('-' * 100)
+
+    ####################################################################################################################
+
+    # Use Bayesian optimization to find the optimum parameters
     for i in range(max_iterations):
         loop_start = time.perf_counter()
         print(f'Round {i + 1} of {max_iterations}')
@@ -124,14 +161,11 @@ if __name__ == '__main__':
         print(f'Time taken for round {i + 1} = {printable_time(run_time)}')
         print(f'Estimated Time Remaining :: {printable_time(eta)}')
         print(f'Would Probably Finish at :: {now_plus_time(eta)}')
-        print('-'*100)
+        print('-' * 100)
 
-    # print(optimizer)
-    # best_params, best_obj = optimizer.result()
-    # print(best_obj, best_params)
+    ####################################################################################################################
+
     para_end = time.perf_counter()
     total_time = para_end - para_start
     print(f"Total Completion_Time :: {printable_time(total_time)}")
     print(f'Optimization Finished at :: {now_plus_time(0)}')
-
-    # print(result_dict)
