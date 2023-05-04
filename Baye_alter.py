@@ -154,7 +154,7 @@ if __name__ == '__main__':
                                     columns=['dispersion_rate', 'decay_rate', 'drop_amount', 'min_exploration',
                                              'exploration_rate', 'exploration_decay', 'learning_rate',
                                              'discounted_return', 'total_food'])
-        df.to_csv(f'Analysis/{batch_name}/Parameters_({n_jobs}cores).csv', index_label='sim_name')
+        df.to_csv(f'Analysis/{batch_name}/0_Parameters.csv', index_label='sim_name')
         loop_end = time.perf_counter()
         run_time = loop_end - loop_start
         eta = run_time * (max_iterations - (i + 1))
