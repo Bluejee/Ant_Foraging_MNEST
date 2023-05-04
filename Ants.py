@@ -401,7 +401,7 @@ class Visualise(Realise):
         plt.ylabel('Counts')
         plt.legend([f'Food/{batch_size} steps'])
         plt.ylim(0, 300)
-        fig_1.savefig('Analysis/' + f'foodper{batch_size}_' + self.sim_name + '.png')
+        fig_1.savefig('Analysis/' + self.sim_name + f'_foodper{batch_size}' + '.png')
         plt.close(fig_1)
 
         fig_2 = plt.figure(2)
@@ -419,7 +419,7 @@ class Visualise(Realise):
         plt.title(f'Action Distribution per {batch_size} Steps')
         plt.xlabel(f'Time Step (x{batch_size})')
         plt.ylabel('Counts')
-        fig_2.savefig('Analysis/' + f'actionper{batch_size}_' + self.sim_name + '.png')
+        fig_2.savefig('Analysis/' + self.sim_name + f'_actionper{batch_size}_' + '.png')
         if show_print:
             print(self.sim_name + ' Completed!')
         plt.close(fig_2)

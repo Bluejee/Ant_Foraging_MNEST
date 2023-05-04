@@ -30,7 +30,7 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
                                  discounted_return=discounted_return,
                                  no_show=True,
                                  start_as='Play',
-                                 max_steps=500000,
+                                 max_steps=600000,
                                  sim_name=sim_name)
         total_food = para_realise.total_food_collected
         result_dict[sim_name] = [dispersion_rate, decay_rate, drop_amount, min_exploration, exploration_rate,
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     ####################################################################################################################
 
     # Setup Initial Variables
-    batch_name = 'Batch_1'
+    batch_name = 'Batch_Trial'
 
     # P.S. not changing the seed will keep giving the same result. So for the same world, change the seed.
     seed = 1  # A Random seed for reproducibility of optimizer.
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     n_jobs = os.cpu_count()  # Max CPUs
 
     # If cores are low then increase the number of iterations.
-    max_iterations = 20  # No. of Optimization iterations (works well for at least 40 cores not so much for 8)
+    max_iterations = 30  # No. of Optimization iterations (works well for at least 40 cores not so much for 8)
 
     ####################################################################################################################
 
@@ -104,13 +104,13 @@ if __name__ == '__main__':
         os.makedirs(f"Analysis/{batch_name}")
 
     # Needs Improvement of display. Use format specifiers to make sure it looks good.
-    with open(f'Analysis/{batch_name}/0_README.', 'w') as f:
-        f.write(f"         Ant Foraging Simulation         ")
-        f.write(f"-----------------------------------------")
-        f.write(f"Batch Name           :: {batch_name}")
-        f.write(f"Random Seed          :: {seed}")
-        f.write(f"Number of Cores      :: {n_jobs}")
-        f.write(f"Number of Iterations :: {max_iterations}")
+    with open(f'Analysis/{batch_name}/0_README.org', 'w') as f:
+        f.write(f"* Ant Foraging Simulation\n")
+        f.write(f"---\n")
+        f.write(f"- Batch Name           :: {batch_name}\n")
+        f.write(f"- Random Seed          :: {seed}\n")
+        f.write(f"- Number of Cores      :: {n_jobs}\n")
+        f.write(f"- Number of Iterations :: {max_iterations}\n")
 
     ####################################################################################################################
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # Create shared dictionary and counter using Manager
     manager = multiprocessing.Manager()
     result_dict = manager.dict()
-    counter = manager.Value('i', 0)
+    counter = manager.Value('i', 1)
 
     ####################################################################################################################
 
