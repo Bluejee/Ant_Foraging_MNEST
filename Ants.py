@@ -275,14 +275,9 @@ class Visualise(Realise):
 
     def reset(self):
         for ant in self.ant_list:
-            # print(ant.position, type(ant.position))
-            # ant.position = Vector2(random.choice(self.world.layers['Home'])).copy()
-            # print(ant.position, type(ant.position))
             ant.has_food = False
             ant.reset_position()
         for layer_type in ['Home', 'Target']:
-            # for position in self.world.layers[layer_type]:
-            # print(type(self.world.layers['Pheromone_' + layer_type]))
             self.world.layers['Pheromone_' + layer_type] *= 0
         return
 
@@ -321,40 +316,30 @@ class Visualise(Realise):
                 # Calculate Reward and food count.
                 if ant.position in self.world.layers['Home']:
                     if ant.has_food:
-                        reward = 100
+                        # reward = 100
+                        reward = 10
                         ant.has_food = False
                         ant.food_count += 1
-                        # new_array = self.food_collected[self.clock.time_step]
-                        # new_array[index] = index + 1
                         self.food_collected[self.clock.time_step][index] = 1
                     else:
-                        reward = -5
+                        # reward = -5
+                        reward = 0
                         pass
                 elif ant.position in self.world.layers['Target']:
                     if ant.has_food:
-                        reward = -5
+                        # reward = -5
+                        reward = 0
                     else:
                         ant.has_food = True
-                        reward = 5
-                    # reward = -1
-
-                    # print('Empty ant in target')
-                # elif ant.has_food and ant.selected_action == 'drop_target':
-                #     reward = -3
-                # elif not ant.has_food and ant.selected_action == 'drop_home':
-                #     reward = -3
-                # elif ant.selected_action in ['drop_home', 'drop_target']:
-                #     reward = -2
+                        # reward = 5
+                        reward = 0
                 else:
                     reward = 0
 
                 ant.earn_reward(reward)
                 if learning:
                     ant.learn()
-            # ant.selected_action = random.choice(ant.action_list)
-            # print(max([len(ant.brain.q_table) for ant in self.ant_list]))
-            # self.max_states_explored[self.clock.time_step] = max([len(ant.brain.q_table) for ant in self.ant_list])
-            # self.food_collected[self.clock.time_step] = [ant.food_count for ant in self.ant_list]
+
         self.pheromone_a.decay('Percentage')
         self.pheromone_b.decay('Percentage')
         self.pheromone_a.disperse()
@@ -415,7 +400,7 @@ class Visualise(Realise):
         plt.xlabel('Time Step')
         plt.ylabel('Counts')
         plt.legend([f'Food/{batch_size} steps'])
-        # plt.ylim(0, 150)
+        plt.ylim(0, 300)
         fig_1.savefig('Analysis/' + f'foodper{batch_size}_' + self.sim_name + '.png')
         plt.close(fig_1)
 
