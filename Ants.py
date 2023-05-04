@@ -252,7 +252,7 @@ class Visualise(Realise):
                              exploration_decay=exploration_decay,
                              learning_rate=learning_rate,
                              discounted_return=discounted_return,
-                             ) for _ in range(10)]
+                             ) for _ in range(30)]
         dispersion_rate = dispersion_rate  # percentage of pheromone to be dispersed.
         # calculate it like this, maybe. if 0.1 of the pheromone is to be dispersed then,
 
