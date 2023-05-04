@@ -5,10 +5,13 @@ from Ants import *
 import time
 import datetime
 import pandas as pd
+import numpy as np
 
 from skopt import Optimizer
 from skopt.space import Real
 from joblib import Parallel, delayed
+
+import matplotlib.pyplot as plt
 
 
 def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, exploration_rate, exploration_decay,
@@ -75,6 +78,25 @@ def now_plus_time(seconds):
     finish_time_string = finish_time.strftime("%Y-%m-%d %H:%M:%S")
 
     return finish_time_string
+
+
+def estimation_graph(file_path):
+    # Load the data
+    data = np.loadtxt(file_path, delimiter=',', skiprows=1)
+    sim_names = data[:, 0]
+    total_food_values = data[:, -1]
+
+    # Plot the data
+    plt.plot(sim_names, total_food_values, '.', label='Food per Sim')
+
+    # Add labels and title
+    plt.legend()
+    plt.xlabel('Sim_Name')
+    plt.ylabel('Total Food Collected')
+    plt.title('Bayesian Estimation Evaluation')
+
+    # Show the plot
+    plt.show()
 
 
 if __name__ == '__main__':
