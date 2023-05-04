@@ -15,9 +15,10 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
                  learning_rate, discounted_return):
     global counter
     global result_dict
+    global batch_name
 
     try:
-        sim_name = str(counter.value)
+        sim_name = batch_name+'/'+str(counter.value)
         counter.value += 1
         para_realise = Visualise(dispersion_rate=dispersion_rate,
                                  decay_rate=decay_rate,
@@ -100,8 +101,8 @@ if __name__ == '__main__':
     counter = manager.Value('i', 0)
 
     n_jobs = os.cpu_count()
-
     max_iterations = 20
+    batch_name = 'Batch_1'
 
     print(f'Optimization Starting at :: {now_plus_time(0)}')
     print(f'Optimization using {n_jobs} Cores')
@@ -116,7 +117,7 @@ if __name__ == '__main__':
                                     columns=['dispersion_rate', 'decay_rate', 'drop_amount', 'min_exploration',
                                              'exploration_rate', 'exploration_decay', 'learning_rate',
                                              'discounted_return', 'total_food'])
-        df.to_csv(f'Analysis/Bayes_Params({n_jobs}cores).csv', index_label='sim_name')
+        df.to_csv(f'Analysis/{batch_name}/Parameters_({n_jobs}cores).csv', index_label='sim_name')
         loop_end = time.perf_counter()
         run_time = loop_end - loop_start
         eta = run_time * (max_iterations - (i + 1))
