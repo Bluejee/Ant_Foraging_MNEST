@@ -22,6 +22,7 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
 
     try:
         sim_name = batch_name + '/' + str(counter.value)
+        sim_count = counter.value
         counter.value += 1
         para_realise = Visualise(dispersion_rate=dispersion_rate,
                                  decay_rate=decay_rate,
@@ -36,8 +37,9 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
                                  max_steps=600000,
                                  sim_name=sim_name)
         total_food = para_realise.total_food_collected
-        result_dict[sim_name] = [dispersion_rate, decay_rate, drop_amount, min_exploration, exploration_rate,
-                                 exploration_decay, learning_rate, discounted_return, total_food]
+        # sim_count and sim_name is basically the same apart from a pre-appended batch name.
+        result_dict[sim_count] = [dispersion_rate, decay_rate, drop_amount, min_exploration, exploration_rate,
+                                  exploration_decay, learning_rate, discounted_return, total_food]
         return total_food
     except Exception as e:
         print(f"Error in simulation : {e}")
@@ -191,3 +193,6 @@ if __name__ == '__main__':
     total_time = para_end - para_start
     print(f"Total Completion_Time :: {printable_time(total_time)}")
     print(f'Optimization Finished at :: {now_plus_time(0)}')
+
+    # Run the estimation graph
+    estimation_graph(f'Analysis/{batch_name}/0_Parameters.csv')
