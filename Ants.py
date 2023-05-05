@@ -315,6 +315,8 @@ class Visualise(Realise):
 
                 # Calculate Reward and food count.
                 if ant.position in self.world.layers['Home']:
+                    # Experimental, making the ant turn around at home.
+                    ant.direction = -ant.direction
                     if ant.has_food:
                         # reward = 100
                         reward = 10
@@ -326,6 +328,8 @@ class Visualise(Realise):
                         reward = 0
                         pass
                 elif ant.position in self.world.layers['Target']:
+                    # Experimental, making the ant turn around at target.
+                    ant.direction = -ant.direction
                     if ant.has_food:
                         # reward = -5
                         reward = 0
