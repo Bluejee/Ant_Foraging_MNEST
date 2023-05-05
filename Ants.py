@@ -325,20 +325,20 @@ class Visualise(Realise):
                         self.food_collected[self.clock.time_step][index] = 1
                     else:
                         # reward = -5
-                        reward = 0
+                        reward = -1
                         pass
                 elif ant.position in self.world.layers['Target']:
                     # Experimental, making the ant turn around at target.
                     ant.direction = -ant.direction
                     if ant.has_food:
                         # reward = -5
-                        reward = 0
+                        reward = -1
                     else:
                         ant.has_food = True
                         # reward = 5
-                        reward = 0
+                        reward = -1
                 else:
-                    reward = 0
+                    reward = -1
 
                 ant.earn_reward(reward)
                 if learning:
