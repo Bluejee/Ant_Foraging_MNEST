@@ -4,6 +4,7 @@ from mnest.Laws import *
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 import time
 import argparse
 import os
@@ -228,7 +229,7 @@ class Visualise(Realise):
         # Create the necessary layers.
         layers = {'Pheromone_Target': ['Float', (250, 10, 50), 'None', 1],
                   'Pheromone_Home': ['Float', (85, 121, 207), 'None', 1],
-                  'Ants': ['Block', (255, 0, 0), 'Stock_Images/ant_sq.png'],
+                  'Ants': ['Block', (255, 0, 0), 'Data/Stock_Images/ant_sq.png'],
                   'Home': ['Block', (50, 98, 209), 'None'],
                   'Target': ['Block', (204, 4, 37), 'None']}
 
@@ -240,8 +241,16 @@ class Visualise(Realise):
         self.max_steps = max_steps
         self.sim_name = sim_name
         # Set up the new variables and performing initial setups.
-        self.world.layers['Home'] = [[15, 15], [16, 16], [15, 16], [16, 15]]
-        self.world.layers['Target'] = [[10, 10], [9, 9], [10, 9], [9, 10]]
+        tl_home = 5  # top left cell of the 2x2 home
+        tl_target = 20  # top left cell of the 2x2 target
+        self.world.layers['Home'] = [[tl_home, tl_home],
+                                     [tl_home + 1, tl_home + 1],
+                                     [tl_home, tl_home + 1],
+                                     [tl_home + 1, tl_home]]
+        self.world.layers['Target'] = [[tl_target, tl_target],
+                                       [tl_target + 1, tl_target + 1],
+                                       [tl_target, tl_target + 1],
+                                       [tl_target + 1, tl_target]]
 
         self.ant_list = [Ant(world=self.world,
                              layer_name='Ants',
@@ -272,6 +281,25 @@ class Visualise(Realise):
 
         # Do not add any variables after calling the loop. it will cause object has no attribute error when used.
         self.run_sim()
+
+    def setup_layers(self, file_path):
+        # This will be added to the Realise function of the MNEST Package.
+
+        # The csv file will contain one column with all the possible layers
+        # we can uncomment and comment the layers using a #
+        # As the layer is checked, the ones with the # wont match and hence wont be active.
+
+        active_layers = []
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                active_layers += row
+        print(active_layers)
+        for layer_name in self.world.layer_data:
+            if layer_name in active_layers:
+                self.display_layers[layer_name].active = 1
+            else:
+                self.display_layers[layer_name].active = 0
 
     def reset(self):
         for ant in self.ant_list:
@@ -318,27 +346,27 @@ class Visualise(Realise):
                     # Experimental, making the ant turn around at home.
                     ant.direction = -ant.direction
                     if ant.has_food:
-                        # reward = 100
-                        reward = 10
+                        reward = 100
+                        # reward = 10
                         ant.has_food = False
                         ant.food_count += 1
                         self.food_collected[self.clock.time_step][index] = 1
                     else:
-                        # reward = -5
-                        reward = -1
+                        reward = -5
+                        # reward = -1
                         pass
                 elif ant.position in self.world.layers['Target']:
                     # Experimental, making the ant turn around at target.
                     ant.direction = -ant.direction
                     if ant.has_food:
-                        # reward = -5
-                        reward = -1
+                        reward = -5
+                        # reward = -1
                     else:
                         ant.has_food = True
-                        # reward = 5
-                        reward = -1
+                        reward = 5
+                        # reward = -1
                 else:
-                    reward = -1
+                    reward = 0
 
                 ant.earn_reward(reward)
                 if learning:
@@ -371,6 +399,10 @@ class Visualise(Realise):
             return
 
     def analyse(self, **kwargs):
+        ###
+        # Using the analysis keybinding to reset layer visualisation.
+        self.setup_layers('Data/Layer_data.csv')
+        ###
         path = "Analysis"
         # Check whether the specified path exists or not
         if not os.path.exists(path):
