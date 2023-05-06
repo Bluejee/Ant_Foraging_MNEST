@@ -75,3 +75,7 @@ parallel_dict_maker('Random')
 # python .\Ants.py --dispersion_rate=0.36061122 --decay_rate=0.2305835 --drop_amount=0.53455935
 # --min_exploration=0.79382278 --exploration_rate=0.91876425 --exploration_decay=0.962777704
 # --learning_rate=0.7284984445 --discounted_return=0.16317983 --sim_name=Hope_1
+
+# python .\Ants.py --dispersion_rate=0.9942416881121815 --decay_rate=0.0 --drop_amount=0.5714313390496405
+# --min_exploration=0.24635531919842119 --exploration_rate=0.9253469328911803 --exploration_decay=0.3233293461380406
+# --learning_rate=0.422595187361183 --discounted_return=0.48672879956102355 --sim_name=Hope_2
