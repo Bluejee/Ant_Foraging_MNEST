@@ -34,7 +34,7 @@ def process_loop(dispersion_rate, decay_rate, drop_amount, min_exploration, expl
                                  discounted_return=discounted_return,
                                  no_show=True,
                                  start_as='Play',
-                                 max_steps=600000,
+                                 max_steps=350000,
                                  sim_name=sim_name)
         total_food = para_realise.total_food_collected
         # sim_count and sim_name is basically the same apart from a pre-appended batch name.
