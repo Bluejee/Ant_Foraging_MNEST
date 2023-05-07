@@ -139,14 +139,14 @@ if __name__ == '__main__':
     ####################################################################################################################
 
     optimizer = Optimizer(
-        dimensions=[Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0),
-                    Real(0.0, 1.0)],
+        dimensions=[Real(0.0, 1.0),  # dispersion_rate
+                    Real(0.0, 1.0),  # decay_rate
+                    Real(0.0, 1.0),  # drop_amount
+                    Real(0.0, 1.0),  # min_exploration must be at least 0.1 % = 0.001, else it might get stuck
+                    Real(0.0, 1.0),  # exploration_rate
+                    Real(0.0, 1.0),  # exploration_decay
+                    Real(0.0, 1.0),  # learning_rate
+                    Real(0.0, 1.0)],  # discounted_return
         random_state=seed,
         base_estimator='gp'
     )
