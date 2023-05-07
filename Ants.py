@@ -444,7 +444,8 @@ class Visualise(Realise):
     def analyse(self, **kwargs):
         ###
         # Using the analysis keybinding to reset layer visualisation.
-        self.setup_layers('Data/Layer_data.csv')
+        if self.visualise:
+            self.setup_layers('Data/Layer_data.csv')
         ###
         path = "Analysis"
         # Check whether the specified path exists or not
