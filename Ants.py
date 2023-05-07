@@ -398,7 +398,7 @@ class Visualise(Realise):
                     ant.history['state_history'].append('Search_Home')  # For Analysis
                     # If the ant is at the Target then it must go Home.
                 else:
-                    reward = 0
+                    reward = -1
                     # If the ant is neither at Home nor the Target, Then it must keep doing what its doing.
                     # if this is during the first step, then its achieved state is to search for food.
                     if len(ant.history['state_history']) != 0:
