@@ -1,0 +1,30 @@
+* Ant_Foraging_MNEST
+Simulation of Ant Foraging with the MNEST Package.
+
+
+* Notes
+- 05/07/2023
+  A lot of things have happend in the time before this but one important thing i learned just now(on a sleepless night at 5 in the morning.) is that, having a system with 0 reward for
+  actions can cause some of the agents to end up in a stand still potition. Ill Describe the case that happend in a simulation. 4 ants, coincidently the first 4 in the list got stuck
+  at home and the target. upon looking at their brains and state it turned out that, for the ants stuch at home, the drop_target was having a 0 value and all others were having a value
+  of something like -2.11 so it ment that 0 was the maximum value and hence thats what the performed. As the reward is 0, it added 0 to 0 and hence it remained the maximum. this would
+  have shifted if the environment changed somehow. but there were 2 other ants that were also trapped in this local minima kind of sittuation. hence they kept producing the pheromones
+  and kept the state hash at the same value. this sort of worked like a loop not allowing the state hash to change and hence not allowing the ants to move. the other ants took this as
+  an opportunity and optimized their algorithems to use this dropings of these poor ants to create a trail of sorts that allowed them to maximize their collections.
+  I will save all this progress under the tag of 'Intersting_1' on Git.
+  Here is the code to rerun the program once that tag is checked out.
+  #+begin_src terminal
+    python .\Ants.py --dispersion_rate=0.9942416881121815 --decay_rate=0.0 --drop_amount=0.5714313390496405 --min_exploration=0.24635531919842119
+    --exploration_rate=0.9253469328911803 --exploration_decay=0.3233293461380406 --learning_rate=0.422595187361183 --discounted_return=0.48672879956102355
+    --sim_name=Hope_2 --max_steps=400000 
+  #+end_src
+  This was an interesting outcome and i was stumped to see it.
+  To see it in action, run the above command on the terminal with the repo checked out at the tag.
+  at about step 40000 run an analysis to get the files and data.
+  also make sure that the visualisation is shown with only the ants.
+  you'll see 4 ants stuck there. then play around with the visualisation to see more.
+  For data, check the cumulative.csv file to see that the first 4 are the only ones that are stuck
+  then check the Ant_0.csv file to see the last few hundred lines of the same state hash and action.
+  then check the Ant_0_Brain.csv to see how the values of the corresponding hashes are.
+  It should be impressive.
+  At lease I was impressed
