@@ -43,6 +43,7 @@ np.random.seed(12345)
 
 show_print = False
 learning = True
+log = False
 
 
 def progress_bar(progress, total):
@@ -426,9 +427,10 @@ class Visualise(Realise):
                 else:
                     ant.cumulative['average_steps_before_collection'] = -1
             # Now for each ant we store the history log values.
-            ant_history_data = ','.join(str(value) for value in ant.history.values())
-            self.write_to_file(data=ant_history_data, file_name=f'Ant_{index}.csv')
-            # Not writing brain values unless analysis is run or at the end cause else it's an overkill.
+            if log:
+                ant_history_data = ','.join(str(value) for value in ant.history.values())
+                self.write_to_file(data=ant_history_data, file_name=f'Ant_{index}.csv')
+                # Not writing brain values unless analysis is run or at the end cause else it's an overkill.
 
         self.pheromone_a.decay('Percentage')
         self.pheromone_b.decay('Percentage')
@@ -444,10 +446,11 @@ class Visualise(Realise):
         #             self.world.layers['Pheromone_' + layer_type][position[1], position[0]] -= 0.01
 
         # Writing the Cumulative data file.
-        with open(f"Analysis/{self.sim_name}/Log/Cumulative.csv",'w') as f:
-            f.write('Total_Food_Collected,Average_Steps_Before_Collection\n')
-            for ant in self.ant_list:
-                f.write(f"{ant.cumulative['total_food_count']},{ant.cumulative['average_steps_before_collection']}\n")
+        if log:
+            with open(f"Analysis/{self.sim_name}/Log/Cumulative.csv", 'w') as f:
+                f.write('Total_Food_Collected,Average_Steps_Before_Collection\n')
+                for ant in self.ant_list:
+                    f.write(f"{ant.cumulative['total_food_count']},{ant.cumulative['average_steps_before_collection']}\n")
 
         if show_print:
             if self.clock.time_step % 5000 == 0:
@@ -481,12 +484,13 @@ class Visualise(Realise):
         if not os.path.exists(path):
             # Create a new directory because it does not exist
             os.makedirs(path)
-        for index, ant in enumerate(self.ant_list):
-            df = pd.DataFrame.from_dict(ant.brain.q_table, orient='index',
-                                        columns=ant.action_list)
-            df.index.name = 'State(HasFood_TimeSinceLstPherDrp_HomeLike_TargetLike)'
-            df.reset_index(inplace=True)
-            df.to_csv(f"Analysis/{self.sim_name}/Log/Ant_{index}_Brain.csv", index=False)
+        if log:
+            for index, ant in enumerate(self.ant_list):
+                df = pd.DataFrame.from_dict(ant.brain.q_table, orient='index',
+                                            columns=ant.action_list)
+                df.index.name = 'State(HasFood_TimeSinceLstPherDrp_HomeLike_TargetLike)'
+                df.reset_index(inplace=True)
+                df.to_csv(f"Analysis/{self.sim_name}/Log/Ant_{index}_Brain.csv", index=False)
 
         ###############################################################################################################
         food = np.array(list(self.food_collected.values()))
