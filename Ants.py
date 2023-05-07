@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
+import pandas as pd
 import time
 import argparse
 import os
@@ -64,9 +65,10 @@ class Ant(Agent):
                  drop_amount=0.05):
         super().__init__(world=world, layer_name=layer_name, child=self, position=position,
                          action_list=['move_random', 'go_home', 'go_target', 'drop_home', 'drop_target'])
-        self.food_count = 0
         self.has_food = False
         self.steps_since_pheromone_drop = 0
+        # self.steps_since_last_food = 0  # might be usefull as a sense.
+
         self.home_likeness = 1  # How much the current cell is like Home according to the home pheromone
         self.target_likeness = 0  # How much the current cell is like Target according to the target pheromone
         # state_list = 'If the ant has food'+                        (True/False)
@@ -85,6 +87,27 @@ class Ant(Agent):
         self.brain.exploration_decay = exploration_decay
         self.brain.learning_rate = learning_rate
         self.brain.discounted_return = discounted_return
+        ################################################################################################################
+        # To Provide data for analysis.
+        # Consider using deque() for optimization later if needed.
+        # Temporary Data
+        # Time Series Data
+        self.history = {
+            'hash_history': [],  # history of the hash which caused it to select the action.
+            'action_history': [],  # Actions taken per timestep.
+            'state_history': [],  # State (Search Food or Search Home) achieved at this time step
+            # State achieved would mean that if the ant gets back home with food,
+            # The state achieved would be Search Food.
+            # I'm still not sure as to what this state history would help me achieve,
+            # But maybe it might come in handy.
+            'food_collection_history': []  # 1 if food was collected within this step, 0 otherwise.
+        }
+
+        # Cumulative Data
+        self.cumulative = {
+            'total_food_count': 0,
+            'average_steps_before_collection': 0  # basically steps per food count.
+        }
         ################################################################################################################
         # to populate the entire state space. This will speed up the simulation.
         full_state_table = {}
@@ -241,8 +264,8 @@ class Visualise(Realise):
         self.max_steps = max_steps
         self.sim_name = sim_name
         # Set up the new variables and performing initial setups.
-        tl_home = 5  # top left cell of the 2x2 home
-        tl_target = 20  # top left cell of the 2x2 target
+        tl_home = 15  # top left cell of the 2x2 home
+        tl_target = 10  # top left cell of the 2x2 target
         self.world.layers['Home'] = [[tl_home, tl_home],
                                      [tl_home + 1, tl_home + 1],
                                      [tl_home, tl_home + 1],
@@ -294,7 +317,7 @@ class Visualise(Realise):
             reader = csv.reader(file)
             for row in reader:
                 active_layers += row
-        print(active_layers)
+        # print(active_layers)
         for layer_name in self.world.layer_data:
             if layer_name in active_layers:
                 self.display_layers[layer_name].active = 1
@@ -325,11 +348,16 @@ class Visualise(Realise):
         # Iterating over all ants.
         for index, ant in enumerate(self.ant_list):
 
+            ant.history['food_collection_history'].append(0)  # For Analysis. will change using time_step.
+            # Else have to repeat the 0 case multiple times.
+
             # use random and not np.random to use objects and not a np array.
             # if self.clock.time_step < 50000:
             if True:
                 ant.sense_state('Initial')
+                ant.history['hash_history'].append(ant.state_hash)  # For Analysis
                 ant.perform_action()
+                ant.history['action_history'].append(ant.selected_action)  # For Analysis
                 ant.sense_state('Final')
 
                 self.action_distribution[self.clock.time_step][ant.action_list.index(ant.selected_action)] += 1
@@ -349,12 +377,14 @@ class Visualise(Realise):
                         reward = 100
                         # reward = 10
                         ant.has_food = False
-                        ant.food_count += 1
+                        ant.cumulative['total_food_count'] += 1
+                        ant.history['food_collection_history'][self.clock.time_step] = 1
                         self.food_collected[self.clock.time_step][index] = 1
                     else:
                         reward = -5
                         # reward = -1
-                        pass
+                    ant.history['state_history'].append('Search_Food')  # For Analysis
+                    # If the ant is home then it must go to the Target.
                 elif ant.position in self.world.layers['Target']:
                     # Experimental, making the ant turn around at target.
                     ant.direction = -ant.direction
@@ -365,12 +395,25 @@ class Visualise(Realise):
                         ant.has_food = True
                         reward = 5
                         # reward = -1
+                    ant.history['state_history'].append('Search_Home')  # For Analysis
+                    # If the ant is at the Target then it must go Home.
                 else:
                     reward = 0
-
+                    # If the ant is neither at Home nor the Target, Then it must keep doing what its doing.
+                    # if this is during the first step, then its achieved state is to search for food.
+                    if len(ant.history['state_history']) != 0:
+                        ant.history['state_history'].append(ant.history['state_history'][-1])  # For Analysis
+                    else:
+                        ant.history['state_history'].append('Search_Food')  # For Analysis
                 ant.earn_reward(reward)
                 if learning:
                     ant.learn()
+                # We calculate the average steps taken to get to food.
+                if ant.cumulative['total_food_count'] != 0:  # For Analysis
+                    ant.cumulative['average_steps_before_collection'] = (self.clock.time_step + 1) / ant.cumulative[
+                        'total_food_count']
+                else:
+                    ant.cumulative['average_steps_before_collection'] = -1
 
         self.pheromone_a.decay('Percentage')
         self.pheromone_b.decay('Percentage')
@@ -408,6 +451,39 @@ class Visualise(Realise):
         if not os.path.exists(path):
             # Create a new directory because it does not exist
             os.makedirs(path)
+
+        ###############################################################################################################
+        # Analysis Data Files.
+        path = f"Analysis/{self.sim_name}/Log"
+        # Check whether the specified path exists or not
+        if not os.path.exists(path):
+            # Create a new directory because it does not exist
+            os.makedirs(path)
+
+        for index, ant in enumerate(self.ant_list):
+            df = pd.DataFrame(ant.history)
+            df.to_csv(f"Analysis/{self.sim_name}/Log/Ant_{index}.csv", index=False)
+
+            df = pd.DataFrame.from_dict(ant.brain.q_table, orient='index',
+                                        columns=ant.action_list)
+            df.index.name = 'State(HasFood_TimeSinceLstPherDrp_HomeLike_TargetLike)'
+            df.reset_index(inplace=True)
+            # If the ant has food'+                        (True/False)
+            #               'time since dropping the last pheromone.'+   (0,1,...4)
+            #               'how much is the cell like home'+            (0,1,2,3,4,...9)
+            #               'how much is the cell like target
+
+            df.to_csv(f"Analysis/{self.sim_name}/Log/Ant_{index}_Brain.csv", index=False)
+
+        data = {
+            'Total_Food_Collected': [ant.cumulative['total_food_count'] for ant in self.ant_list],
+            'Average_Steps_Before_Collection': [ant.cumulative['average_steps_before_collection'] for ant in
+                                                self.ant_list]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(f"Analysis/{self.sim_name}/Log/Cumulative.csv", index=False)
+
+        ###############################################################################################################
         food = np.array(list(self.food_collected.values()))
         actions = np.array(list(self.action_distribution.values()), dtype=int)
         self.total_food_collected = np.sum(food)
